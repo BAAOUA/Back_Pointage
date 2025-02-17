@@ -2,7 +2,7 @@
   {
     "name": "jwt-key",
     "type": "java.lang.String",
-    "description": "Cle de securité jwt"
+    "description": "Clé de securité jwt"
   },
   {
     "name": "access-expiration",

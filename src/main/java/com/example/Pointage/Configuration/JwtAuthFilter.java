@@ -2,6 +2,7 @@ package com.example.Pointage.Configuration;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -28,7 +30,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   private CustomUserDetailServices userDetailServices;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+  protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
       throws ServletException, IOException {
       String token = null;
       String username = null;
@@ -54,9 +56,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       } catch (io.jsonwebtoken.security.SignatureException e) {
         System.out.println("Invalid JWT signature" + e.getMessage());
       } catch (Exception e) {
-        System.out.println("An unexpected error occurred" + e.getMessage());
+        System.out.println("An unxepected error occurred" + e.getMessage());
       }
-    filterChain.doFilter(request, response);
+      filterChain.doFilter(request, response);
+      
   }
   
   private String getTokenFromRequest(HttpServletRequest request){

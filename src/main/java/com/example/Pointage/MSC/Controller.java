@@ -6,6 +6,8 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -13,6 +15,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,17 +43,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 @CrossOrigin(origins="http://localhost:3000", allowedHeaders = "*")
 public class Controller {
 
+  private static final Logger logger = LogManager.getLogger(Controller.class);
+
   @Autowired
-  private EmployeeRepository empRepo;
+  private EmployeeService empService;
   @Autowired
   private AuthenticationManager authManager;
   @Autowired
   private JwtService jwtService;
+  private CustomUserDetailServices usserDetaisServices;
+  public Controller(){
+    this.usserDetaisServices = new CustomUserDetailServices();
+  }
 
   @PostMapping("/auth/login")
   public ResponseEntity<?> login(@RequestBody LoginDAO loginDAO ){
-    if(!new CustomUserDetailServices().getAuthUser(loginDAO)){
-      System.out.println("login info incorrect   ");
+    if(!usserDetaisServices.getAuthUser(loginDAO)){
       return ResponseEntity.badRequest().body("Nom d'utilisateur ou mot de passe incorrect.");
     }
     ResponseData response = new ResponseData();
@@ -70,9 +78,9 @@ public class Controller {
         System.out.println("Clear context !!!!");
         SecurityContextHolder.clearContext();
       }
+      logger.info("Logout");
       return ResponseEntity.ok().body("Deconexion avec succes");
   }
-  
   @PostMapping("/auth/refresh-token")
   public ResponseEntity<?> refreshToken(@RequestBody Object token){
     String refreshToken = token.toString();
@@ -85,20 +93,18 @@ public class Controller {
         return ResponseEntity.ok().body(new ResponseData(jwtService.generateAccessToken(username), jwtService.generateRefreshToken(username)));
       }
     } catch (Exception e) {
-      System.out.println("An unexpected error occurred" + e.getMessage());
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     }
     return ResponseEntity.badRequest().body(Map.of("error", "Erreur de génération de refresh token"));
   }
 
-  
   @GetMapping("/employees")
   public ResponseEntity<?> getEmployees(@RequestParam(value = "date", required = false) String date) {
     if(date != null){
       LocalDate localDate = LocalDate.parse(date);
-      return ResponseEntity.ok().body(empRepo.findByDate(localDate));
+      return ResponseEntity.ok().body(empService.findAllByDate(localDate));
     }
-    return ResponseEntity.ok().body(empRepo.findAll());
+    return ResponseEntity.ok().body(empService.findAllEmployees());
   }
   
   public boolean valideExcel(Row row ){{
@@ -120,12 +126,14 @@ public class Controller {
   @PostMapping("/employees/add")
   public ResponseEntity<?> addEmployees(@RequestParam("data") MultipartFile data) {
       if(data == null){
-        return ResponseEntity.ok().body("Pas de fichier envoyé");
+        return ResponseEntity.badRequest().body("Pas de fichier envoyé");
       }
       try{
         Workbook xlsx = new XSSFWorkbook(data.getInputStream());
         Sheet sheet = xlsx.getSheetAt(0);
+
         if(!valideExcel(sheet.getRow(0))){
+          xlsx.close();
           return ResponseEntity.badRequest().body("Le fichier ne respecte pas le format requis");
         }
         for(int i=1;i<sheet.getPhysicalNumberOfRows() ;i++) {    
@@ -136,10 +144,11 @@ public class Controller {
           employee.setDate(getLocalDate(row.getCell(2)));
           employee.setHeureEntree(getLocalTime(row.getCell(3)));
           employee.setHeureSortie(getLocalTime(row.getCell(4)));
-          empRepo.save(employee);
+          empService.Ajouter(employee);
         }
+        xlsx.close();
       }catch(IOException ex){
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.badRequest().body("Un erreur est servenu");
       }
       return ResponseEntity.ok().build();
   }

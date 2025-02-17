@@ -17,17 +17,31 @@ public class CustomUserDetailServices implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) {
-    if("admin".equals(username)){
-      String pwdEncode = passwordEncoder.encode("admin123");
-    return User.builder()
-                .username("admin")
+    
+    String pwdEncode;
+    if(username.equals("admin")){
+      pwdEncode = passwordEncoder.encode("admin123");
+      return User.builder()
+                .username(username)
                 .password(pwdEncode)
                 .roles("ADMIN")
                 .build();
-    } 
-    return null;
+    }
+    if(username.equals("brahim")){
+      pwdEncode = passwordEncoder.encode("brahim123");
+      return User.builder()
+                .username(username)
+                .password(pwdEncode)
+                .roles("USER")
+                .build();
+    }
+    return null; 
   }
   public boolean getAuthUser(LoginDAO login){
-    return login.getUsername().equals("admin") && login.getPassword().equals("admin123");
+    boolean admin = login.getUsername().equals("admin") && login.getPassword().equals("admin123");
+    boolean user = login.getUsername().equals("brahim") && login.getPassword().equals("brahim123");
+
+    
+    return admin || user;
 }
 }
