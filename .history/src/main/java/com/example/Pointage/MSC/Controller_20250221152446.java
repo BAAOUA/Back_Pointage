@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@CrossOrigin(origins="*", allowedHeaders = "*")
+@CrossOrigin(origins="http://localhost:3000", allowedHeaders = "*")
 public class Controller {
 
   private static final Logger logger = LogManager.getLogger(Controller.class);
@@ -62,9 +62,7 @@ public class Controller {
       return ResponseEntity.badRequest().body("Nom d'utilisateur ou mot de passe incorrect.");
     }
     ResponseData response = new ResponseData();
-    response.setUsername(loginDAO.getUsername());
-    response.setRole(loginDAO.getUsername().equals("admin")? "ADMIN" : "USER");
-    
+    response.se
     Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(loginDAO.getUsername(), loginDAO.getPassword()));
     if(authentication.isAuthenticated()){
       response.setAccessToken(jwtService.generateAccessToken(loginDAO.getUsername()));

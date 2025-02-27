@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@CrossOrigin(origins="*", allowedHeaders = "*")
+@CrossOrigin(origins="http://localhost:3000", allowedHeaders = "*")
 public class Controller {
 
   private static final Logger logger = LogManager.getLogger(Controller.class);
@@ -63,7 +63,7 @@ public class Controller {
     }
     ResponseData response = new ResponseData();
     response.setUsername(loginDAO.getUsername());
-    response.setRole(loginDAO.getUsername().equals("admin")? "ADMIN" : "USER");
+    loginDAO.getUsername().equals(response)
     
     Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(loginDAO.getUsername(), loginDAO.getPassword()));
     if(authentication.isAuthenticated()){

@@ -180,7 +180,7 @@ public class ControllerIntegrationTest {
 
         given(jwtService.generateAccessToken(anyString())).willReturn("accessTokenValide");
         given(jwtService.generateRefreshToken("admin")).willReturn("refreshTokenValide");
-        ResponseData rsponse = new ResponseData("admin","ADMIN","accessTokenValide", "refreshTokenValide");
+        ResponseData rsponse = new ResponseData(admin"accessTokenValide", "refreshTokenValide");
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\" : \"admin\", \"password\": \"admin123\"}"))

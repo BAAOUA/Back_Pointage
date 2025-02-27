@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignorer le dossier .history
+.history/
+
+# Ignorer les fichiers de logs
+*.log
+logs/

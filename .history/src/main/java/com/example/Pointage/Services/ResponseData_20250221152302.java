@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseData {
-  private String username;
-  private String Role;
+  private String username
   private String accessToken;
   private String refreshToken;
 }

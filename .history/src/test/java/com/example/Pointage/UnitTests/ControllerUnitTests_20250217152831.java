@@ -114,7 +114,7 @@ public class ControllerUnitTests {
         given(jwtService.generateRefreshToken("user")).willReturn("refreshToken");
         ResponseEntity<?> response = controller.refreshToken(token);
         assertThat(response.getStatusCode().value()).isEqualTo(200);
-        assertThat(response.getBody()).isEqualTo(new ResponseData(null, null, "accesToken", "refreshToken"));
+        assertThat(response.getBody()).isEqualTo(new ResponseData("accesToken", "refreshToken"));
     }
 
     @Test
